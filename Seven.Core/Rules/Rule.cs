@@ -1,6 +1,6 @@
 ﻿namespace Seven.Core.Rules
 {
-    public record Rule(
+    public record class Rule(
         int Version,
         string Name,
         int NumPlayers,

@@ -9,7 +9,10 @@
     {
         public static double GetWinPoint(WinPointMethod method, int rank) => method switch
         {
-            WinPointMethod.Standard => rank == 0 ? 4 : rank == 1 ? 2 : rank == 2 ? 1 : 0,
+            WinPointMethod.Standard => rank == 0 ? 4
+                : rank == 1 ? 2
+                : rank == 2 ? 1
+                : 0,
             _ => throw new NotSupportedException()
         };
     }
