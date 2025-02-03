@@ -1,6 +1,5 @@
 ﻿using Seven.Core.Engines;
 using Seven.Core.Rules;
-using System.Web;
 
 namespace Seven.Core.Models
 {
@@ -14,12 +13,22 @@ namespace Seven.Core.Models
 
     public class Game : IReadonlyGame
     {
-        public Game(Rule rule, IEnumerable<IEngine> engines)
+        public Game(Rule rule, IEngine[] engines)
         {
-            // TODO: players, currentPlayerIndexの初期化
-            throw new NotImplementedException();
-
             this.Rule = rule;
+
+            int numPlayers = engines.Length;
+            ulong[] dealtCards = Util.GetDealtCards(numPlayers, rule.ContainsJoker);
+            // ダイヤの7を持つプレイヤーから開始
+            this.currentPlayerIndex = Array.FindIndex(dealtCards, cards => (cards & 1UL << 32) > 0);
+            if (this.currentPlayerIndex == -1) throw new InvalidOperationException();
+
+            this.players = new Player[numPlayers];
+            for (int i = 0; i < numPlayers; ++i)
+            {
+                // 各スートの7を除いた手札を配る
+                this.players[i] = new Player(dealtCards[i] ^ 0b0000001000000_0000001000000_0000001000000_0000001000000UL, this, engines[i]);
+            }
         }
 
         private readonly Board board = new();
