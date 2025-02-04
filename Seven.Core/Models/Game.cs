@@ -80,6 +80,32 @@ namespace Seven.Core.Models
             }
         }
 
+        public void PlayerWin(Player player)
+        {
+            for (int rank = 0; rank < this.players.Length; ++rank)
+            {
+                if (this.players.All(p => p.Rank != rank))
+                {
+                    player.Rank = rank;
+                    return;
+                }
+            }
+            throw new InvalidOperationException();
+        }
+
+        public void PlayerLose(Player player)
+        {
+            for (int rank = this.players.Length - 1; rank >= 0; --rank)
+            {
+                if (this.players.All(p => p.Rank != rank))
+                {
+                    player.Rank = rank;
+                }
+            }
+            if (player.Rank == -1) throw new InvalidOperationException();
+            this.board.Cards |= player.Cards;
+        }
+
         public bool Play()
         {
             int card = this.CurrentPlayer.Play();

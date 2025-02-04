@@ -12,7 +12,7 @@
             this.Cards = 1UL << 6 | 1UL << 19 | 1UL << 32 | 1UL << 45;
         }
 
-        public ulong Cards { get; private set; }
+        public ulong Cards { get; set; }
 
         public void SetCard(int card)
         {
