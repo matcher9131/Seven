@@ -5,11 +5,12 @@ namespace Seven.Core.Engines
 {
     public class EngineStandardRandom : EngineBase
     {
-        private readonly Random random = new();
+        private readonly IRandom random;
 
-        public EngineStandardRandom(Rule rule) : base("StandardRandom")
+        public EngineStandardRandom(Rule rule, IRandom random) : base("StandardRandom")
         {
             if (rule != Rule.Standard) throw new NotSupportedException("This engine does not support the given rule.");
+            this.random = random;
         }
 
         public override int Next(IReadonlyGame game, IPlayer player)
@@ -42,7 +43,7 @@ namespace Seven.Core.Engines
                     if ((game.Board.Cards & 1UL << i) == 0) break;
                 }
             }
-            return options[random.Next(options.Count)];
+            return options[this.random.Next(options.Count)];
         }
     }
 }

@@ -14,12 +14,13 @@ namespace Seven.Core.Models
 
     public class Game : IReadonlyGame
     {
-        public Game(Rule rule, IEngine[] engines)
+        public Game(Rule rule, ulong[] dealtCards, IEngine[] engines)
         {
+            if (dealtCards.Length != engines.Length) throw new InvalidOperationException("Lengths of 'dealtCards' and 'engines' does not match.");
+
             this.Rule = rule;
 
             int numPlayers = engines.Length;
-            ulong[] dealtCards = Util.GetDealtCards(numPlayers, rule.ContainsJoker);
             // ダイヤの7を持つプレイヤーから開始
             this.currentPlayerIndex = Array.FindIndex(dealtCards, cards => (cards & 1UL << 32) > 0);
             if (this.currentPlayerIndex == -1) throw new InvalidOperationException();

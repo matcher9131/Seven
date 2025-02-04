@@ -1,10 +1,10 @@
-﻿namespace Seven.Core
+﻿namespace Seven.Core.Models
 {
-    public static class Util
+    public class Dealer(IRandom random)
     {
-        private static Random random = new Random();
+        private readonly IRandom random = random;
 
-        public static ulong[] GetDealtCards(int numPlayers, bool containsJoker)
+        public ulong[] Deal(int numPlayers, bool containsJoker)
         {
             int numCards = containsJoker ? 53 : 52;
             int[] playerNumCards = Enumerable.Repeat(numCards / numPlayers, numPlayers).ToArray();
