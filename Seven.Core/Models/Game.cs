@@ -8,7 +8,8 @@ namespace Seven.Core.Models
         IReadonlyBoard Board { get; }
         IEnumerable<IReadonlyPlayer> Players { get; }
         Rule Rule { get; }
-        void SetPlayerRank(Player player, bool wins);
+        void PlayerWin(Player player);
+        void PlayerLose(Player player);
     }
 
     public class Game : IReadonlyGame
@@ -52,7 +53,7 @@ namespace Seven.Core.Models
 
         private Player CurrentPlayer => this.players[currentPlayerIndex];
 
-        public void SetPlayerRank(Player player, bool wins)
+        private void SetPlayerRank(Player player, bool wins)
         {
             if (wins)
             {
@@ -82,27 +83,12 @@ namespace Seven.Core.Models
 
         public void PlayerWin(Player player)
         {
-            for (int rank = 0; rank < this.players.Length; ++rank)
-            {
-                if (this.players.All(p => p.Rank != rank))
-                {
-                    player.Rank = rank;
-                    return;
-                }
-            }
-            throw new InvalidOperationException();
+            this.SetPlayerRank(player, true);
         }
 
         public void PlayerLose(Player player)
         {
-            for (int rank = this.players.Length - 1; rank >= 0; --rank)
-            {
-                if (this.players.All(p => p.Rank != rank))
-                {
-                    player.Rank = rank;
-                }
-            }
-            if (player.Rank == -1) throw new InvalidOperationException();
+            this.SetPlayerRank(player, false);
             this.board.Cards |= player.Cards;
         }
 

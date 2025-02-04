@@ -40,7 +40,7 @@ namespace Seven.Core.Models
                 ++this.NumPasses;
                 if (this.NumPasses >= this.game.Rule.NumPasses)
                 {
-                    this.game.SetPlayerRank(this, false);
+                    this.game.PlayerLose(this);
                 }
             }
             else
@@ -48,7 +48,7 @@ namespace Seven.Core.Models
                 this.Cards ^= 1UL << card;
                 if (this.NumCards == 0)
                 {
-                    this.game.SetPlayerRank(this, true);
+                    this.game.PlayerWin(this);
                 }
             }
 
