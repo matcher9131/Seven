@@ -1,45 +1,34 @@
-﻿using Seven.Core.Engines;
-using Seven.Core.Rules;
+﻿using Seven.Core.Rules;
 
 namespace Seven.Core.Models
 {
     public interface IReadonlyGame
     {
         IReadonlyBoard Board { get; }
-        IEnumerable<IReadonlyPlayer> Players { get; }
+        IEnumerable<IOtherPlayer> Players { get; }
         Rule Rule { get; }
-        void PlayerWin(Player player);
-        void PlayerLose(Player player);
+        void PlayerWin(IPlayer player);
+        void PlayerLose(IPlayer player);
     }
 
     public class Game : IReadonlyGame
     {
-        public Game(Rule rule, ulong[] dealtCards, IEngine[] engines)
+        private bool initialized;
+
+        public Game(Rule rule, IBoard board, IPlayer[] players)
         {
-            if (dealtCards.Length != engines.Length) throw new InvalidOperationException("Lengths of 'dealtCards' and 'engines' does not match.");
-
             this.Rule = rule;
-
-            int numPlayers = engines.Length;
-            // ダイヤの7を持つプレイヤーから開始
-            this.currentPlayerIndex = Array.FindIndex(dealtCards, cards => (cards & 1UL << 32) > 0);
-            if (this.currentPlayerIndex == -1) throw new InvalidOperationException();
-
-            this.players = new Player[numPlayers];
-            for (int i = 0; i < numPlayers; ++i)
-            {
-                // 各スートの7を除いた手札を配る
-                this.players[i] = new Player(dealtCards[i] ^ 0b0000001000000_0000001000000_0000001000000_0000001000000UL, this, engines[i]);
-            }
+            this.board = board;
+            this.players = players;
         }
 
-        private readonly Board board = new();
+        private readonly IBoard board;
         public IReadonlyBoard Board => this.board;
 
-        private readonly Player[] players;
-        private int currentPlayerIndex;
+        private readonly IPlayer[] players;
+        private int currentPlayerIndex = -1;
 
-        public IEnumerable<IReadonlyPlayer> Players
+        public IEnumerable<IOtherPlayer> Players
         {
             get
             {
@@ -52,9 +41,9 @@ namespace Seven.Core.Models
 
         public Rule Rule { get; }
 
-        private Player CurrentPlayer => this.players[currentPlayerIndex];
+        private IPlayer CurrentPlayer => this.players[currentPlayerIndex];
 
-        private void SetPlayerRank(Player player, bool wins)
+        private void SetPlayerRank(IPlayer player, bool wins)
         {
             if (wins)
             {
@@ -62,7 +51,7 @@ namespace Seven.Core.Models
                 {
                     if (this.players.All(p => p.Rank != rank))
                     {
-                        player.Rank = rank;
+                        player.SetRank(rank);
                         return;
                     }
                 }
@@ -74,7 +63,7 @@ namespace Seven.Core.Models
                 {
                     if (this.players.All(p => p.Rank != rank))
                     {
-                        player.Rank = rank;
+                        player.SetRank(rank);
                         return;
                     }
                 }
@@ -82,19 +71,31 @@ namespace Seven.Core.Models
             }
         }
 
-        public void PlayerWin(Player player)
+        public void PlayerWin(IPlayer player)
         {
             this.SetPlayerRank(player, true);
         }
 
-        public void PlayerLose(Player player)
+        public void PlayerLose(IPlayer player)
         {
             this.SetPlayerRank(player, false);
-            this.board.Cards |= player.Cards;
+            this.board.SetCards(player.Cards);
         }
 
         public bool Play()
         {
+            if (!this.initialized)
+            {
+                this.currentPlayerIndex = Array.FindIndex(this.players, p => p.Has(Const.SevenOfDiamonds));
+                foreach (var player in this.players)
+                {
+                    player.PutSevens();
+                }
+                this.board.SetCards(Const.Sevens);
+                this.initialized = true;
+                return false;
+            }
+
             int card = this.CurrentPlayer.Play();
             if (card >= 0)
             {

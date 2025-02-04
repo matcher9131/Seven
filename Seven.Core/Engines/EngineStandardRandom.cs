@@ -13,7 +13,7 @@ namespace Seven.Core.Engines
             this.random = random;
         }
 
-        public override int Next(IReadonlyGame game, IPlayer player)
+        public override int Next(IReadonlyGame game, IReadonlyPlayer player)
         {
             List<int> options = [];
             if (player.NumPasses < game.Rule.NumPasses)
