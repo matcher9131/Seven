@@ -1,12 +1,12 @@
 ﻿using Seven.Core.Engines;
 using Seven.Core.Models;
 
-namespace Seven.Core.Test.TestData
+namespace Seven.Core.Test.TestDoubles
 {
     // 常に出せる最小のカードを出すEngine
-    public class TestEngine : EngineBase
+    public class EngineMinCard : EngineBase
     {
-        public TestEngine() : base("TestEngine")
+        public EngineMinCard() : base("EngineMinCard")
         {
         }
 
