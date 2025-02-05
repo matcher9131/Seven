@@ -95,10 +95,10 @@ namespace Seven.Core.Models
             }
 
             // 残り1人になったら順位をつけて終わる
-            var unfinishedPlayer = this.players.SingleOrDefault(p => p.Rank == -1);
-            if (unfinishedPlayer is not null)
+            var unfinishedPlayers = this.players.Where(p => p.Rank == -1);
+            if (unfinishedPlayers.Count() == 1)
             {
-                SetPlayerRank(unfinishedPlayer, true);
+                SetPlayerRank(unfinishedPlayers.First(), true);
                 return true;
             }
 
