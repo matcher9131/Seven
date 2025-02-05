@@ -48,7 +48,7 @@ namespace Seven.Core.Models
 
         public void PutSevens()
         {
-            this.Cards ^= Const.Sevens;
+            this.Cards &= ~Const.Sevens;
         }
 
         public int Play(IReadonlyGame game) {
