@@ -10,7 +10,7 @@ namespace Seven.Core.Test.TestDoubles
         {
         }
 
-        public override int Next(IReadonlyGame game, IPlayer player)
+        public override int Next(IReadonlyGame game, IReadonlyPlayer player)
         {
             for (int suit = 0; suit < 4; ++suit)
             {

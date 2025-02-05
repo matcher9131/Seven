@@ -7,16 +7,16 @@ namespace Seven.Core.Test.TestDoubles
     {
         public IReadonlyBoard Board => throw new NotImplementedException();
 
-        public IEnumerable<IReadonlyPlayer> Players => throw new NotImplementedException();
+        public IEnumerable<IOtherPlayer> Players => throw new NotImplementedException();
 
         public Rule Rule => throw new NotImplementedException();
 
-        public void PlayerWin(Player player)
+        public void PlayerWin(IPlayer player)
         {
             throw new NotImplementedException();
         }
 
-        public void PlayerLose(Player player)
+        public void PlayerLose(IPlayer player)
         {
             throw new NotImplementedException();
         }
