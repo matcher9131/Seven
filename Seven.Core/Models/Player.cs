@@ -56,7 +56,7 @@ namespace Seven.Core.Models
             if (card == -1)
             {
                 ++this.NumPasses;
-                if (this.NumPasses >= this.rule.NumPasses)
+                if (this.NumPasses > this.rule.NumPasses)
                 {
                     game.PlayerLose(this);
                 }
