@@ -1,4 +1,5 @@
 ﻿using Seven.Core.Engines;
+using Seven.Core.Rules;
 using System.Numerics;
 
 namespace Seven.Core.Models
@@ -25,12 +26,12 @@ namespace Seven.Core.Models
         bool Has(int card);
         void SetRank(int rank);
         void PutSevens();
-        int Play();
+        int Play(IReadonlyGame game);
     }
 
-    public class Player(ulong cards, IReadonlyGame game, IEngine engine) : IPlayer
+    public class Player(Rule rule, ulong cards, IEngine engine) : IPlayer
     {
-        private readonly IReadonlyGame game = game;
+        private readonly Rule rule = rule;
         private readonly IEngine engine = engine;
 
         public ulong Cards { get; private set; } = cards;
@@ -50,14 +51,14 @@ namespace Seven.Core.Models
             this.Cards ^= Const.Sevens;
         }
 
-        public int Play() {
-            int card = this.engine.Next(this.game, this);
+        public int Play(IReadonlyGame game) {
+            int card = this.engine.Next(game, this);
             if (card == -1)
             {
                 ++this.NumPasses;
-                if (this.NumPasses >= this.game.Rule.NumPasses)
+                if (this.NumPasses >= this.rule.NumPasses)
                 {
-                    this.game.PlayerLose(this);
+                    game.PlayerLose(this);
                 }
             }
             else
@@ -65,7 +66,7 @@ namespace Seven.Core.Models
                 this.Cards ^= 1UL << card;
                 if (this.NumCards == 0)
                 {
-                    this.game.PlayerWin(this);
+                    game.PlayerWin(this);
                 }
             }
 

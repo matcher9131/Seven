@@ -11,21 +11,13 @@ namespace Seven.Core.Models
         void PlayerLose(IPlayer player);
     }
 
-    public class Game : IReadonlyGame
+    public class Game(Rule rule, IBoard board, IPlayer[] players) : IReadonlyGame
     {
         private bool initialized;
-
-        public Game(Rule rule, IBoard board, IPlayer[] players)
-        {
-            this.Rule = rule;
-            this.board = board;
-            this.players = players;
-        }
-
-        private readonly IBoard board;
+        private readonly IBoard board = board;
         public IReadonlyBoard Board => this.board;
 
-        private readonly IPlayer[] players;
+        private readonly IPlayer[] players = players;
         private int currentPlayerIndex = -1;
 
         public IEnumerable<IOtherPlayer> Players
@@ -39,7 +31,7 @@ namespace Seven.Core.Models
             }
         }
 
-        public Rule Rule { get; }
+        public Rule Rule { get; } = rule;
 
         private IPlayer CurrentPlayer => this.players[currentPlayerIndex];
 
@@ -96,7 +88,7 @@ namespace Seven.Core.Models
                 return false;
             }
 
-            int card = this.CurrentPlayer.Play();
+            int card = this.CurrentPlayer.Play(this);
             if (card >= 0)
             {
                 this.board.SetCard(card);
