@@ -1,7 +1,7 @@
 ﻿using Moq;
+using Seven.Core.Engines;
 using Seven.Core.Models;
 using Seven.Core.Rules;
-using Seven.Core.Test.TestDoubles;
 
 namespace Seven.Core.Test.Models
 {
@@ -10,16 +10,16 @@ namespace Seven.Core.Test.Models
         [Fact]
         public void NumCardsTest()
         {
-            var engine = new EngineStub();
-            var player = new Player(Rule.Standard, 0b0100000010000_1101000101100_0011100110111_1110000001001UL, engine);
+            var engineMock = new Mock<IEngine>();
+            var player = new Player(Rule.Standard, 0b0100000010000_1101000101100_0011100110111_1110000001001UL, engineMock.Object);
             Assert.Equal(21, player.NumCards);
         }
 
         [Fact]
         public void HasTest()
         {
-            var engine = new EngineStub();
-            var player = new Player(Rule.Standard, 0b0100000010000_1101000101100_0011100110111_1110000001001UL, engine);
+            var engineMock = new Mock<IEngine>();
+            var player = new Player(Rule.Standard, 0b0100000010000_1101000101100_0011100110111_1110000001001UL, engineMock.Object);
             Assert.True(player.Has(0));
             Assert.True(player.Has(15));
             Assert.False(player.Has(16));
@@ -28,8 +28,8 @@ namespace Seven.Core.Test.Models
         [Fact]
         public void SetRankTest()
         {
-            var engine = new EngineStub();
-            var player = new Player(Rule.Standard, 0, engine);
+            var engineMock = new Mock<IEngine>();
+            var player = new Player(Rule.Standard, 0, engineMock.Object);
             player.SetRank(3);
             Assert.Equal(3, player.Rank);
         }
@@ -37,8 +37,8 @@ namespace Seven.Core.Test.Models
         [Fact]
         public void PutSevensTest()
         {
-            var engine = new EngineStub();
-            var player = new Player(Rule.Standard, 0b0000001000110_0001000000000_1000001000011_0000001000000UL, engine);
+            var engineMock = new Mock<IEngine>();
+            var player = new Player(Rule.Standard, 0b0000001000110_0001000000000_1000001000011_0000001000000UL, engineMock.Object);
             player.PutSevens();
             Assert.Equal(0b0000000000110_0001000000000_1000000000011_0000000000000UL, player.Cards);
         }
@@ -46,8 +46,10 @@ namespace Seven.Core.Test.Models
         [Fact]
         public void PlayTestLose()
         {
-            var engine = new EngineStub() { NextCard = -1 };
-            var player = new Player(Rule.Standard, 0, engine);
+            var engineMock = new Mock<IEngine>();
+            engineMock.Setup(engine => engine.Next(It.IsAny<IReadonlyGame>(), It.IsAny<IReadonlyPlayer>())).Returns(-1);
+            // var engine = new EngineStub() { NextCard = -1 };
+            var player = new Player(Rule.Standard, 0, engineMock.Object);
             var gameMock = new Mock<IReadonlyGame>();
 
             player.Play(gameMock.Object);
@@ -71,17 +73,18 @@ namespace Seven.Core.Test.Models
         [Fact]
         public void PlayTestWin()
         {
-            var engine = new EngineStub();
-            var player = new Player(Rule.Standard, 0b11UL, engine);
+            var engineMock = new Mock<IEngine>();
+            engineMock.SetupSequence(engine => engine.Next(It.IsAny<IReadonlyGame>(), It.IsAny<IReadonlyPlayer>()))
+                    .Returns(0)
+                    .Returns(1);
+            var player = new Player(Rule.Standard, 0b11UL, engineMock.Object);
             var gameMock = new Mock<IReadonlyGame>();
-            engine.NextCard = 0;
 
             player.Play(gameMock.Object);
 
             Assert.Equal(0b10UL, player.Cards);
             gameMock.Verify(game => game.PlayerWin(player), Times.Never());
 
-            engine.NextCard = 1;
             player.Play(gameMock.Object);
 
             Assert.Equal(0UL, player.Cards);
