@@ -43,6 +43,8 @@ namespace Seven.Core.Engines
                     if ((game.Board.Cards & 1UL << i) == 0) break;
                 }
             }
+
+            if (options.Count == 0) return -1;
             return options[this.random.Next(options.Count)];
         }
     }
