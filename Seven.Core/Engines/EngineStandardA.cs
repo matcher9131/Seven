@@ -1,4 +1,5 @@
 ﻿using Seven.Core.Models;
+using Seven.Core.Rules;
 using System.Numerics;
 
 namespace Seven.Core.Engines
@@ -8,8 +9,9 @@ namespace Seven.Core.Engines
     {
         private readonly IRandom random;
 
-        public EngineStandardA(IRandom random) : base("Standard A")
+        public EngineStandardA(Rule rule, IRandom random) : base("Standard A")
         {
+            if (rule != Rule.Standard) throw new NotSupportedException("This engine does not support the given rule.");
             this.random = random;
         }
 
