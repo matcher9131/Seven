@@ -1,5 +1,6 @@
 ﻿using Seven.Core.Models;
 using Seven.Core.Rules;
+using System.Collections.ObjectModel;
 using System.Numerics;
 
 namespace Seven.Core.Engines
@@ -16,7 +17,7 @@ namespace Seven.Core.Engines
         }
 
         // Valueが小さいほど優先すべき行動
-        private static readonly IReadOnlyDictionary<int, int> PriorityMap = Enumerable.Range(-1, 33).ToDictionary(x =>
+        private static readonly ReadOnlyDictionary<int, int> PriorityMap = new(Enumerable.Range(-1, 33).ToDictionary(x =>
         {
             // パス: 4
             if (x == -1) return 4;
@@ -49,7 +50,7 @@ namespace Seven.Core.Engines
                     _ => throw new InvalidOperationException()
                 };
             }
-        }, x => x);
+        }, x => x));
 
         private static readonly int[] Upper = [12, 11, 10, 9, 8, 7];
         private static readonly int[] Lower = [0, 1, 2, 3, 4, 5];
@@ -102,7 +103,7 @@ namespace Seven.Core.Engines
                     int priority = PriorityMap[pattern];
                     if (priority < currentPriority)
                     {
-                        priority = currentPriority;
+                        currentPriority = priority;
                         playCardOptions.Clear();
                         playCardOptions.Add(playCard);
                     }
