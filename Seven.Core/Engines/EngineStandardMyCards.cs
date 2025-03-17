@@ -10,7 +10,7 @@ namespace Seven.Core.Engines
         private readonly IRandom random;
         private readonly ReadOnlyDictionary<int, int> priorityMap;
 
-        public EngineStandardMyCards(Rule rule, IRandom random, ReadOnlyDictionary<int, int> priorityMap): base("Standard MyCards")
+        public EngineStandardMyCards(Rule rule, IRandom random, ReadOnlyDictionary<int, int> priorityMap)
         {
             if (rule != Rule.Standard) throw new NotSupportedException("This engine does not support the given rule.");
             this.random = random;
