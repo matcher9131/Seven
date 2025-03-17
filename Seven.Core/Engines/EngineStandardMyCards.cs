@@ -43,6 +43,7 @@ namespace Seven.Core.Engines
                 if ((cards & 1UL << cardIndex) > 0)
                 {
                     pattern |= 1 << bitIndex;
+                    ++bitIndex;
                     playCard = cardIndex;
                 }
                 else if ((boardCards & 1UL << cardIndex) == 0)
