@@ -50,7 +50,7 @@ namespace Seven.Core.Test.Engines
             player.SetupGet(player => player.NumPasses).Returns(2);
             var random = new Mock<IRandom>();
             random.Setup(random => random.Next(It.IsAny<int>())).Returns(0);
-            var engine = new EngineStandardRandom(Rule.Standard, random.Object);
+            var engine = new EngineStandardA(Rule.Standard, random.Object);
 
             int actual = engine.Next(game.Object, player.Object);
 
@@ -70,7 +70,7 @@ namespace Seven.Core.Test.Engines
             player.SetupGet(player => player.NumPasses).Returns(3);
             var random = new Mock<IRandom>();
             random.Setup(random => random.Next(It.IsAny<int>())).Returns(0);
-            var engine = new EngineStandardRandom(Rule.Standard, random.Object);
+            var engine = new EngineStandardA(Rule.Standard, random.Object);
 
             int actual = engine.Next(game.Object, player.Object);
 
@@ -90,7 +90,7 @@ namespace Seven.Core.Test.Engines
             player.SetupGet(player => player.NumPasses).Returns(2);
             var random = new Mock<IRandom>();
             random.Setup(random => random.Next(It.IsAny<int>())).Returns(0);
-            var engine = new EngineStandardRandom(Rule.Standard, random.Object);
+            var engine = new EngineStandardA(Rule.Standard, random.Object);
 
             int actual = engine.Next(game.Object, player.Object);
 
@@ -115,7 +115,7 @@ namespace Seven.Core.Test.Engines
                 .Returns(2)
                 .Returns(3)
                 .Returns(4);
-            var engine = new EngineStandardRandom(Rule.Standard, random.Object);
+            var engine = new EngineStandardA(Rule.Standard, random.Object);
 
             int[] expectedValues = [16, 29, 35, 44, 46];
 
