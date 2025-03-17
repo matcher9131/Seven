@@ -29,7 +29,7 @@ namespace Seven.Core.Test.Engines
             player.SetupGet(player => player.Cards).Returns(0b110000_0_001100__000010_0_001001__100010_0_011111__111110_0_000000UL);
             player.SetupGet(player => player.NumPasses).Returns(3);
             var random = new Mock<IRandom>();
-            random.Setup(random => random.Next(It.IsAny<int>())).Returns(1);
+            random.Setup(random => random.Next(It.IsAny<int>())).Returns(0);
             var engine = new EngineStandardRandom(Rule.Standard, random.Object);
 
             int actual = engine.Next(game.Object, player.Object);
