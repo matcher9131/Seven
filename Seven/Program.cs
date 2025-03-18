@@ -3,14 +3,7 @@ using Seven.Core.Engines;
 using Seven.Core.Models;
 using Seven.Core.Rules;
 
-void ClearCurrentRow()
-{
-    Console.SetCursorPosition(0, Console.CursorTop);
-    Console.Write(new string(' ', Console.WindowWidth));
-    Console.SetCursorPosition(0, Console.CursorTop);
-}
-
-const int NumThreads = 8;
+const int NumGames = 10000000;
 
 Rule rule = Rule.Standard;
 IEngine[] engines = Enumerable.Range(0, rule.NumPlayers).Select<int, IEngine>((_, i) => i switch
@@ -19,31 +12,30 @@ IEngine[] engines = Enumerable.Range(0, rule.NumPlayers).Select<int, IEngine>((_
     _ => new EngineStandardRandom(rule, new StandardRandom())
 }).ToArray();
 
-int[] points = Enumerable.Repeat(0, rule.NumPlayers).ToArray();
+int numInvalidGames = 0;
+object lockObject = new();
 
-const int NumGames = 1000000;
-
-// TODO: use Parallel.For 
-
-Dealer dealer = new(new StandardRandom());
-for (int gameIndex = 0; gameIndex < NumGames; ++gameIndex)
+int[] sumPoints = Enumerable.Range(0, NumGames).AsParallel().Select(_ =>
 {
-    if (gameIndex % 10000 == 0)
-    {
-        ClearCurrentRow();
-        Console.Write($"{gameIndex} / {NumGames} games");
-    }
+    int[] points = Enumerable.Repeat(0, rule.NumPlayers).ToArray();
+    Dealer dealer = new(new StandardRandom());
 
     ulong[] cards = dealer.Deal(rule.NumPlayers, rule.ContainsJoker);
     Player[] players = engines.Zip(cards, (engine, card) => new Player(rule, card, engine)).ToArray();
     Board board = new();
     Game game = new(rule, board, players);
     const int MAX_PLAY_COUNT = 1000;
-    for (int playIndex = 0; playIndex <  MAX_PLAY_COUNT; ++playIndex)
+    for (int playIndex = 0; playIndex < MAX_PLAY_COUNT; ++playIndex)
     {
         bool result = game.Play();
         if (result) break;
-        if (playIndex == MAX_PLAY_COUNT - 1) throw new InvalidOperationException("Invalid game");
+        if (playIndex == MAX_PLAY_COUNT - 1)
+        {
+            lock(lockObject)
+            {
+                ++numInvalidGames;
+            }
+        }
     }
     for (int playerIndex = 0; playerIndex < players.Length; ++playerIndex)
     {
@@ -55,13 +47,18 @@ for (int gameIndex = 0; gameIndex < NumGames; ++gameIndex)
             _ => 0
         };
     }
-}
 
-ClearCurrentRow();
+    return points;
+}).Aggregate((x, y) => x.Zip(y, (xi, yi) => xi + yi).ToArray());
+
 Console.WriteLine($"Results of {NumGames} games.");
-for (int i = 0; i < points.Length; ++i)
+if (numInvalidGames > 0)
 {
-    Console.WriteLine($"Player {i}: {points[i]} pts. ({engines[i].GetType().Name})");
+    Console.WriteLine($"{numInvalidGames} invalid games ({NumGames - numInvalidGames} valid games)");
+}
+for (int i = 0; i < sumPoints.Length; ++i)
+{
+    Console.WriteLine($"Player {i}: {sumPoints[i]} pts. ({engines[i].GetType().Name})");
 }
 
 
