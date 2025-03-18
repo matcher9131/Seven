@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seven.Core", "Seven.Core\Se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seven.Core.Test", "Seven.Core.Test\Seven.Core.Test.csproj", "{9C2C37F1-629B-4B1B-84A2-D238B25504B3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsole", "TestConsole\TestConsole.csproj", "{7BD30820-C46D-4E77-8B6F-9EB2E9083C65}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{9C2C37F1-629B-4B1B-84A2-D238B25504B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C2C37F1-629B-4B1B-84A2-D238B25504B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C2C37F1-629B-4B1B-84A2-D238B25504B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BD30820-C46D-4E77-8B6F-9EB2E9083C65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BD30820-C46D-4E77-8B6F-9EB2E9083C65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BD30820-C46D-4E77-8B6F-9EB2E9083C65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BD30820-C46D-4E77-8B6F-9EB2E9083C65}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
