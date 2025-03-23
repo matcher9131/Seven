@@ -30,30 +30,24 @@
         /// <param name="beginInclusive">切り取る半開区間の左端</param>
         /// <param name="endExclusive">切り取る半開区間の右端</param>
         /// <param name="insertIndex">挿入する箇所</param>
-        /// <remarks>※ 破壊的メソッド</remarks>
-        public static void CutAndInsert(int[] x, int beginInclusive, int endExclusive, int insertIndex)
+        /// <returns>新たな配列</returns>
+        public static int[] CutAndInsert(int[] x, int beginInclusive, int endExclusive, int insertIndex)
         {
             int[] result = new int[x.Length];
             for (int i = 0; i < endExclusive - beginInclusive; ++i)
             {
-                result[insertIndex + i] = x[i];
+                result[insertIndex + i] = x[beginInclusive + i];
             }
-            int from = 0, to = 0;
-            while (true)
+            int[] tmp = [.. x[.. beginInclusive], .. x[endExclusive ..]];
+            for (int i = 0; i < insertIndex; ++i)
             {
-                if (from >= x.Length || to >= result.Length) break;
-                result[to] = x[from];
-                ++from;
-                ++to;
-                if (from == insertIndex)
-                {
-                    to += endExclusive - beginInclusive;
-                }
-                else if (from == beginInclusive)
-                {
-                    from = endExclusive;
-                }
+                result[i] = tmp[i];
             }
+            for (int i = 0; i < tmp.Length - insertIndex; ++i)
+            {
+                result[^(i + 1)] = tmp[^(i + 1)];
+            }
+            return result;
         }
     }
 }

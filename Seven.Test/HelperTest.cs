@@ -18,9 +18,8 @@
         [ClassData(typeof(HelperTestData))]
         public void CutAndInsertTest(int[] perm, int l, int r, int i, int[] expected)
         {
-            int[] actual = [.. perm];
-            Helper.CutAndInsert(actual, l, r, i);
-            Assert.Equal(actual, expected);
+            var actual = Helper.CutAndInsert(perm, l, r, i);
+            Assert.Equal(expected, actual);
         }
     }
 }
