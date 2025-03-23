@@ -2,13 +2,13 @@
 using Seven.Core.Engines;
 using Seven.Core.Models;
 using Seven.Core.Rules;
+using static Seven.Helper;
 
 namespace Seven
 {
     public class GeneticAlgorithm(IRandom random)
     {
         private const int N = 32;
-        private const int K = 16;
         private readonly int[] indices = [.. Enumerable.Range(0, N)];
 
         private readonly IRandom random = random;
@@ -24,21 +24,31 @@ namespace Seven
 
         public (int[] c1, int[] c2) Cross(int[] p1, int[] p2)
         {
-            this.RandomizeIndices();
-            int[] fromP1 = [.. this.indices[0..K].Select(i => p1[i])];
-            int[] c1 = new int[N];
-            int fromP1Index = 0;
-            for (int i = 0; i < c1.Length; ++i)
+            static void mutate(int[] genes, IRandom random)
             {
-                c1[i] = fromP1.Contains(p2[i]) ? fromP1[fromP1Index++] : p2[i];
+                int l = random.Next(N);
+                int r = random.Next(N);
+                if (l > r)
+                {
+                    (l, r) = (r, l);
+                }
+                ++r;
+                int i = random.Next(N - (r - l));
+                CutAndInsert(genes, l, r, i);
             }
+            const int MutationPercent = 10;
 
-            int[] fromP2 = [.. this.indices[0..K].Select(i => p2[i])];
-            int[] c2 = new int[N];
-            int fromP2Index = 0;
-            for (int i = 0; i < c2.Length; ++i)
+            this.RandomizeIndices();
+            int[] c1 = OrderBasedCrossover(p1, p2, this.indices);
+            int[] c2 = OrderBasedCrossover(p2, p1, this.indices);
+
+            if (this.random.Next(100) < MutationPercent)
             {
-                c2[i] = fromP2.Contains(p1[i]) ? fromP2[fromP2Index++] : p1[i];
+                mutate(c1, this.random);
+            }
+            if (this.random.Next(100) < MutationPercent)
+            {
+                mutate(c2, this.random);
             }
 
             return (c1, c2);
@@ -53,7 +63,7 @@ namespace Seven
             int numInvalidGames = 0;
             object lockObject = new();
 
-            int sumPoint = Enumerable.Range(0, NumGames).AsParallel().Select(_ =>
+            int sumPoint = Enumerable.Range(0, NumGames).AsParallel().Sum(_ =>
             {
                 ulong[] cards = dealer.Deal(rule.NumPlayers, rule.ContainsJoker);
                 Player[] players = [.. engines.Zip(cards, (engine, card) => new Player(rule, card, engine))];
@@ -80,7 +90,7 @@ namespace Seven
                     2 => 1,
                     _ => 0
                 };
-            }).Sum();
+            });
 
             return sumPoint / (7.0 * (NumGames - numInvalidGames));
         }
