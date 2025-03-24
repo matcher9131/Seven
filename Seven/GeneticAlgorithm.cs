@@ -12,6 +12,8 @@ namespace Seven
         private const int K = 16;
         private readonly int[] indices = [.. Enumerable.Range(0, N)];
 
+        const int MutationPercent = 10;
+
         private readonly IRandom random = random;
 
         private void RandomizeIndices()
@@ -27,34 +29,24 @@ namespace Seven
 
         public (int[] c1, int[] c2) Cross(int[] p1, int[] p2)
         {
-            static void mutate(int[] genes, IRandom random)
-            {
-                int l = random.Next(N);
-                int r = random.Next(N);
-                if (l > r)
-                {
-                    (l, r) = (r, l);
-                }
-                ++r;
-                int i = random.Next(N - (r - l));
-                CutAndInsert(genes, l, r, i);
-            }
-            const int MutationPercent = 10;
-
             this.RandomizeIndices();
             int[] c1 = OrderBasedCrossover(p1, p2, this.indices.AsSpan()[..K]);
             int[] c2 = OrderBasedCrossover(p2, p1, this.indices.AsSpan()[..K]);
 
-            if (this.random.Next(100) < MutationPercent)
-            {
-                mutate(c1, this.random);
-            }
-            if (this.random.Next(100) < MutationPercent)
-            {
-                mutate(c2, this.random);
-            }
-
             return (c1, c2);
+        }
+
+        public static int[] Mutate(int[] genes, IRandom random)
+        {
+            int l = random.Next(N);
+            int r = random.Next(N);
+            if (l > r)
+            {
+                (l, r) = (r, l);
+            }
+            ++r;
+            int i = random.Next(N - (r - l));
+            return CutAndInsert(genes, l, r, i);
         }
 
         public static double Evaluate(Rule rule, Dealer dealer, Func<IEngine> engineFactory, Func<IEngine[]> oppositeEnginesFactory)
