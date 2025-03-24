@@ -9,23 +9,24 @@ namespace Seven
     public class GeneticAlgorithm(IRandom random)
     {
         private const int N = 32;
+        private const int K = 16;
         private readonly int[] indices = [.. Enumerable.Range(0, N)];
 
         private readonly IRandom random = random;
 
         private void RandomizeIndices()
         {
+            // 全体をランダムにシャッフルしてからOrderBasedCrossoverのために先頭K個を昇順にソートする
             for (int i = this.indices.Length - 1; i > 0; --i)
             {
                 int j = random.Next(i + 1);
                 (this.indices[i], this.indices[j]) = (this.indices[j], this.indices[i]);
             }
+            Array.Sort(this.indices, 0, K);
         }
 
         public (int[] c1, int[] c2) Cross(int[] p1, int[] p2)
         {
-            const int K = 16;
-
             static void mutate(int[] genes, IRandom random)
             {
                 int l = random.Next(N);

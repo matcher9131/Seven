@@ -7,8 +7,9 @@
         /// </summary>
         /// <param name="x">親1</param>
         /// <param name="y">親2</param>
-        /// <param name="randomIndices">ランダムなインデックスを得るための配列</param>
+        /// <param name="randomIndices">ランダムなインデックス（昇順）</param>
         /// <returns>子</returns>
+        /// <remarks><paramref name="randomIndices"/>が昇順でない場合は誤った結果が得られる</remarks>
         public static int[] OrderBasedCrossover(int[] x, int[] y, ReadOnlySpan<int> randomIndices)
         {
             int[] fromX = new int[randomIndices.Length];
