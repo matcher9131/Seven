@@ -11,14 +11,12 @@
         /// <returns>子</returns>
         public static int[] OrderBasedCrossover(int[] x, int[] y, int[] randomIndices)
         {
-            const int N = 32, K = 16;
-
-            int[] fromX = [.. randomIndices[0..K].Select(i => x[i])];
-            int[] result = new int[N];
-            int fromP1Index = 0;
+            int[] fromX = [.. randomIndices[0 .. (x.Length / 2)].Select(i => x[i])];
+            int[] result = new int[x.Length];
+            int xIndex = 0;
             for (int i = 0; i < result.Length; ++i)
             {
-                result[i] = fromX.Contains(y[i]) ? fromX[fromP1Index++] : y[i];
+                result[i] = fromX.Contains(y[i]) ? fromX[xIndex++] : y[i];
             }
             return result;
         }

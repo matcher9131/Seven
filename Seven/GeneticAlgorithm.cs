@@ -15,7 +15,7 @@ namespace Seven
 
         private void RandomizeIndices()
         {
-            for (int i = this.indices.Length - 1; i >= 0; --i)
+            for (int i = this.indices.Length - 1; i > 0; --i)
             {
                 int j = random.Next(i + 1);
                 (this.indices[i], this.indices[j]) = (this.indices[j], this.indices[i]);
