@@ -24,6 +24,8 @@ namespace Seven
 
         public (int[] c1, int[] c2) Cross(int[] p1, int[] p2)
         {
+            const int K = 16;
+
             static void mutate(int[] genes, IRandom random)
             {
                 int l = random.Next(N);
@@ -39,8 +41,8 @@ namespace Seven
             const int MutationPercent = 10;
 
             this.RandomizeIndices();
-            int[] c1 = OrderBasedCrossover(p1, p2, this.indices);
-            int[] c2 = OrderBasedCrossover(p2, p1, this.indices);
+            int[] c1 = OrderBasedCrossover(p1, p2, this.indices.AsSpan()[..K]);
+            int[] c2 = OrderBasedCrossover(p2, p1, this.indices.AsSpan()[..K]);
 
             if (this.random.Next(100) < MutationPercent)
             {

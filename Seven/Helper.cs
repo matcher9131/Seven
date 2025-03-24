@@ -9,9 +9,13 @@
         /// <param name="y">親2</param>
         /// <param name="randomIndices">ランダムなインデックスを得るための配列</param>
         /// <returns>子</returns>
-        public static int[] OrderBasedCrossover(int[] x, int[] y, int[] randomIndices)
+        public static int[] OrderBasedCrossover(int[] x, int[] y, ReadOnlySpan<int> randomIndices)
         {
-            int[] fromX = [.. randomIndices[0 .. (x.Length / 2)].Select(i => x[i])];
+            int[] fromX = new int[randomIndices.Length];
+            for (int i = 0; i < fromX.Length; ++i)
+            {
+                fromX[i] = x[randomIndices[i]];
+            }
             int[] result = new int[x.Length];
             int xIndex = 0;
             for (int i = 0; i < result.Length; ++i)
