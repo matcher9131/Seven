@@ -1,31 +1,10 @@
-﻿namespace Seven
+﻿using Seven.Core;
+using System;
+
+namespace Seven.GA
 {
     public static class Helper
     {
-        /// <summary>
-        /// 一様順序交叉を行う
-        /// </summary>
-        /// <param name="x">親1</param>
-        /// <param name="y">親2</param>
-        /// <param name="randomIndices">ランダムなインデックス（昇順）</param>
-        /// <returns>子</returns>
-        /// <remarks><paramref name="randomIndices"/>が昇順でない場合は誤った結果が得られる</remarks>
-        public static int[] OrderBasedCrossover(int[] x, int[] y, ReadOnlySpan<int> randomIndices)
-        {
-            int[] fromX = new int[randomIndices.Length];
-            for (int i = 0; i < fromX.Length; ++i)
-            {
-                fromX[i] = x[randomIndices[i]];
-            }
-            int[] result = new int[x.Length];
-            int xIndex = 0;
-            for (int i = 0; i < result.Length; ++i)
-            {
-                result[i] = fromX.Contains(y[i]) ? fromX[xIndex++] : y[i];
-            }
-            return result;
-        }
-
         /// <summary>
         /// 配列の一部を切り取り、順番を保ったまま任意の箇所に挿入する
         /// </summary>
@@ -51,6 +30,21 @@
                 result[^(i + 1)] = tmp[^(i + 1)];
             }
             return result;
+        }
+
+        /// <summary>
+        /// 配列全体をシャッフルする
+        /// </summary>
+        /// <param name="x">配列</param>
+        /// <param name="random">シャッフルに用いる乱数</param>
+        /// <remarks>※破壊的メソッド</remarks>
+        public static void Shuffle(this System.Collections.IList x, IRandom random)
+        {
+            for (int i = x.Count - 1; i > 0; --i)
+            {
+                int j = random.Next(i + 1);
+                (x[i], x[j]) = (x[j], x[i]);
+            }
         }
     }
 }
