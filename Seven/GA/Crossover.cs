@@ -1,46 +1,55 @@
 ﻿using Seven.Core;
+using System.Collections.Immutable;
 
 namespace Seven.GA
 {
     public class Crossover(IRandom random)
     {
-        private const int N = 32;
         private const int K = 16;
-        private readonly int[] indices = [.. Enumerable.Range(0, N)];
 
         private readonly IRandom random = random;
 
-        public void RandomizeIndices()
+        private List<int> GetRandomIndices()
         {
-            // 全体をランダムにシャッフルしてからOrderBasedCrossoverのために先頭K個を昇順にソートする
-            for (int i = this.indices.Length - 1; i > 0; --i)
+            List<int> result = [];
+            ImmutableArray<int> vertexes = Graph.GetVertexes();
+            for (int i = 0; i < vertexes.Length; ++i)
             {
-                int j = random.Next(i + 1);
-                (this.indices[i], this.indices[j]) = (this.indices[j], this.indices[i]);
+                if (this.random.Next(vertexes.Length) < K - result.Count)
+                {
+                    result.Add(vertexes[i]);
+                }
             }
-            Array.Sort(this.indices, 0, K);
+            return result;
         }
 
         /// <summary>
         /// 一様順序交叉を行う
         /// </summary>
-        /// <param name="x">親1</param>
-        /// <param name="y">親2</param>
+        /// <param name="p1">親1</param>
+        /// <param name="p2">親2</param>
         /// <returns>子</returns>
-        public int[] Cross(int[] x, int[] y)
+        public (int[] c1, int[] c2) Cross(int[] p1, int[] p2)
         {
-            int[] fromX = new int[indices.Length];
-            for (int i = 0; i < fromX.Length; ++i)
+            List<int> indices = this.GetRandomIndices();
+
+            int[] crossInner(int[] x, int[] y)
             {
-                fromX[i] = x[indices[i]];
+                int[] fromX = new int[indices.Count];
+                for (int i = 0; i < fromX.Length; ++i)
+                {
+                    fromX[i] = x[indices[i]];
+                }
+                int[] result = new int[x.Length];
+                int xIndex = 0;
+                for (int i = 0; i < result.Length; ++i)
+                {
+                    result[i] = fromX.Contains(y[i]) ? fromX[xIndex++] : y[i];
+                }
+                return result;
             }
-            int[] result = new int[x.Length];
-            int xIndex = 0;
-            for (int i = 0; i < result.Length; ++i)
-            {
-                result[i] = fromX.Contains(y[i]) ? fromX[xIndex++] : y[i];
-            }
-            return result;
+
+            return (crossInner(p1, p2), crossInner(p2, p1));
         }
     }
 }
