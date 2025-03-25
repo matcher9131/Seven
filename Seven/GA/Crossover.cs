@@ -12,7 +12,7 @@ namespace Seven.GA
         private List<int> GetRandomIndices()
         {
             List<int> result = [];
-            ImmutableArray<int> vertexes = Graph.GetVertexes();
+            ReadOnlySpan<int> vertexes = Graph.GetVertexes();
             for (int i = 0; i < vertexes.Length; ++i)
             {
                 if (this.random.Next(vertexes.Length) < K - result.Count)

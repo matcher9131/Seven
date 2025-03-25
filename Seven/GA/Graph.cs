@@ -6,13 +6,13 @@ namespace Seven.GA
 {
     public static class Graph
     {
-        private static readonly FrozenDictionary<int, ImmutableList<int>> graph;
+        private static readonly FrozenDictionary<int, ImmutableArray<int>> graph;
         private static readonly FrozenDictionary<int, int> inDegrees;
         private static readonly List<int> sources;
 
         static Graph()
         {
-            graph = new Dictionary<int, ImmutableList<int>>()
+            graph = new Dictionary<int, ImmutableArray<int>>()
             {
                 { -1, [] },
                 { 1, [2, 4, 8, 16, 32] },
@@ -58,15 +58,15 @@ namespace Seven.GA
                 }
             }
             inDegrees = tmpInDegree.ToFrozenDictionary();
-            sources = [.. graph.Where(kvp => kvp.Value.Count == 0).Select(kvp => kvp.Key)];
+            sources = [.. graph.Where(kvp => kvp.Value.Length == 0).Select(kvp => kvp.Key)];
         }
+        public static ReadOnlySpan<int> GetVertexes() => graph.Keys.AsSpan();
 
-        public static ImmutableList<int> GetNeighbors(int from) => graph[from];
+        public static ReadOnlySpan<int> GetNeighbors(int from) => graph[from].AsSpan();
 
         public static Dictionary<int, int> GetInDegrees() => new(inDegrees);
 
         public static List<int> GetSourceVertexes() => [.. sources];
 
-        public static ImmutableArray<int> GetVertexes() => graph.Keys;
     }
 }
