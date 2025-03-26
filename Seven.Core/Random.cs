@@ -3,6 +3,7 @@
     public interface IRandom
     {
         int Next(int maxValue);
+        double NextDouble();
     }
 
     public class StandardRandom : IRandom
@@ -11,6 +12,11 @@
         public int Next(int maxValue)
         {
             return this.random.Next(maxValue);
+        }
+
+        public double NextDouble()
+        {
+            return this.random.NextDouble();
         }
     }
 }
