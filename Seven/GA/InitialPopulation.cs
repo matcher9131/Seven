@@ -12,13 +12,14 @@ namespace Seven.GA
             List<int> result = [];
             List<int> source = Graph.GetSourceVertexes();
 
-            while (source.Count > 0)
+            while (inDegree.Count > 0)
             {
                 List<int> nextSource = [];
                 source.Shuffle(this.random);
                 result.AddRange(source);
                 foreach (int from in source)
                 {
+                    inDegree.Remove(from);
                     foreach (int to in Graph.GetNeighbors(from))
                     {
                         --inDegree[to];
@@ -34,12 +35,12 @@ namespace Seven.GA
             return result;
         }
 
-        public int[][] Generate(int size)
+        public List<int[]> Generate(int size)
         {
-            int[][] result = new int[size][];
-            for (int i = 0; i < result.Length; ++i)
+            List<int[]> result = new(size);
+            for (int i = 0; i < size; ++i)
             {
-                result[i] = [.. this.GenerateOne()];
+                result.Add([.. this.GenerateOne()]);
             }
             return result;
         }

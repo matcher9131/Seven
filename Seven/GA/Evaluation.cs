@@ -9,11 +9,11 @@ namespace Seven.GA
         private readonly Rule rule = rule;
         private readonly Dealer dealer = dealer;
 
-        public double Evaluate(IEngine engine, Func<IEngine[]> oppositeEnginesFactory)
+        public double Evaluate(IEngine engine, IEngine[] oppositeEngines)
         {
-            const int NumGames = 10000000;
+            const int NumGames = 100000;
 
-            IEngine[] engines = [engine, .. oppositeEnginesFactory()];
+            IEngine[] engines = [engine, .. oppositeEngines];
 
             int numInvalidGames = 0;
             object lockObject = new();

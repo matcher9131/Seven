@@ -6,18 +6,18 @@ namespace Seven.GA
     public class Crossover(IRandom random)
     {
         private const int K = 16;
+        private static readonly int[] Indices = [.. Enumerable.Range(0, Graph.NumVertexes)];
 
         private readonly IRandom random = random;
 
         private List<int> GetRandomIndices()
         {
-            List<int> result = [];
-            ReadOnlySpan<int> vertexes = Graph.GetVertexes();
-            for (int i = 0; i < vertexes.Length; ++i)
+            List<int> result = new(K);
+            for (int i = 0; i < Indices.Length; ++i)
             {
-                if (this.random.Next(vertexes.Length) < K - result.Count)
+                if (this.random.Next(Indices.Length - i) < K - result.Count)
                 {
-                    result.Add(vertexes[i]);
+                    result.Add(Indices[i]);
                 }
             }
             return result;
@@ -31,14 +31,14 @@ namespace Seven.GA
         /// <returns>子</returns>
         public (int[] c1, int[] c2) Cross(int[] p1, int[] p2)
         {
-            List<int> indices = this.GetRandomIndices();
+            List<int> randomIndices = this.GetRandomIndices();
 
             int[] crossInner(int[] x, int[] y)
             {
-                int[] fromX = new int[indices.Count];
+                int[] fromX = new int[randomIndices.Count];
                 for (int i = 0; i < fromX.Length; ++i)
                 {
-                    fromX[i] = x[indices[i]];
+                    fromX[i] = x[randomIndices[i]];
                 }
                 int[] result = new int[x.Length];
                 int xIndex = 0;

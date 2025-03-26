@@ -1,6 +1,5 @@
 ﻿using System.Collections.Frozen;
 using System.Collections.Immutable;
-using System.Collections.ObjectModel;
 
 namespace Seven.GA
 {
@@ -58,7 +57,7 @@ namespace Seven.GA
                 }
             }
             inDegrees = tmpInDegree.ToFrozenDictionary();
-            sources = [.. graph.Where(kvp => kvp.Value.Length == 0).Select(kvp => kvp.Key)];
+            sources = [.. inDegrees.Where(kvp => kvp.Value == 0).Select(kvp => kvp.Key)];
         }
         public static ReadOnlySpan<int> GetVertexes() => graph.Keys.AsSpan();
 
@@ -67,6 +66,8 @@ namespace Seven.GA
         public static Dictionary<int, int> GetInDegrees() => new(inDegrees);
 
         public static List<int> GetSourceVertexes() => [.. sources];
+
+        public static int NumVertexes => graph.Count;
 
     }
 }
