@@ -65,7 +65,7 @@ namespace Seven.GA
 
         public static Dictionary<int, int> GetInDegrees() => new(inDegrees);
 
-        public static List<int> GetSourceVertexes() => [.. sources];
+        public static int[] GetSourceVertexes() => [.. sources];
 
         public static int NumVertexes => graph.Count;
 

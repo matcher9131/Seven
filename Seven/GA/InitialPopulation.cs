@@ -10,12 +10,12 @@ namespace Seven.GA
         {
             Dictionary<int, int> inDegree = Graph.GetInDegrees();
             List<int> result = [];
-            List<int> source = Graph.GetSourceVertexes();
+            int[] source = Graph.GetSourceVertexes();
 
             while (inDegree.Count > 0)
             {
                 List<int> nextSource = [];
-                source.Shuffle(this.random);
+                this.random.Shuffle(source);
                 result.AddRange(source);
                 foreach (int from in source)
                 {
@@ -29,7 +29,7 @@ namespace Seven.GA
                         }
                     }
                 }
-                source = nextSource;
+                source = [.. nextSource];
             }
 
             return result;

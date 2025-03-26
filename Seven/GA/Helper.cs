@@ -31,20 +31,5 @@ namespace Seven.GA
             }
             return result;
         }
-
-        /// <summary>
-        /// 配列全体をシャッフルする
-        /// </summary>
-        /// <param name="x">配列</param>
-        /// <param name="random">シャッフルに用いる乱数</param>
-        /// <remarks>※破壊的メソッド</remarks>
-        public static void Shuffle(this System.Collections.IList x, IRandom random)
-        {
-            for (int i = x.Count - 1; i > 0; --i)
-            {
-                int j = random.Next(i + 1);
-                (x[i], x[j]) = (x[j], x[i]);
-            }
-        }
     }
 }

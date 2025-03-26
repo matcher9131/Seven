@@ -4,6 +4,7 @@
     {
         int Next(int maxValue);
         double NextDouble();
+        void Shuffle<T>(T[] span);
     }
 
     public class StandardRandom : IRandom
@@ -17,6 +18,11 @@
         public double NextDouble()
         {
             return this.random.NextDouble();
+        }
+
+        public void Shuffle<T>(T[] span)
+        {
+            this.random.Shuffle(span);
         }
     }
 }
