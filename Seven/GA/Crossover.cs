@@ -12,6 +12,7 @@ namespace Seven.GA
 
         private List<int> GetRandomIndices()
         {
+            // 昇順を保つため、くじを戻さないくじ引き方式でインデックスの昇順に採用/不採用を決める
             List<int> result = new(K);
             for (int i = 0; i < Indices.Length; ++i)
             {
@@ -35,7 +36,7 @@ namespace Seven.GA
 
             int[] crossInner(int[] x, int[] y)
             {
-                int[] fromX = new int[randomIndices.Count];
+                Span<int> fromX = stackalloc int[K];
                 for (int i = 0; i < fromX.Length; ++i)
                 {
                     fromX[i] = x[randomIndices[i]];
