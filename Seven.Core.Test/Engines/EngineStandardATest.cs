@@ -1,6 +1,7 @@
 ﻿using Moq;
 using Seven.Core.Engines;
 using Seven.Core.Models;
+using Seven.Core.Random;
 using Seven.Core.Rules;
 
 namespace Seven.Core.Test.Engines
@@ -29,7 +30,7 @@ namespace Seven.Core.Test.Engines
             player.SetupGet(player => player.Cards).Returns(0b110000_0_001100__000010_0_001001__100010_0_011111__111110_0_000000UL);
             player.SetupGet(player => player.NumPasses).Returns(3);
             var random = new Mock<IRandom>();
-            random.Setup(random => random.Next(It.IsAny<int>())).Returns(0);
+            random.Setup(random => random.Next(It.IsAny<uint>())).Returns(0);
             var engine = new EngineStandardA(Rule.Standard, random.Object);
 
             int actual = engine.Next(game.Object, player.Object);
@@ -49,7 +50,7 @@ namespace Seven.Core.Test.Engines
             player.SetupGet(player => player.Cards).Returns(0b010000_0_100100__001000_0_100010__000100_0_100001__000010_0_000000UL);
             player.SetupGet(player => player.NumPasses).Returns(2);
             var random = new Mock<IRandom>();
-            random.Setup(random => random.Next(It.IsAny<int>())).Returns(0);
+            random.Setup(random => random.Next(It.IsAny<uint>())).Returns(0);
             var engine = new EngineStandardA(Rule.Standard, random.Object);
 
             int actual = engine.Next(game.Object, player.Object);
@@ -69,7 +70,7 @@ namespace Seven.Core.Test.Engines
             player.SetupGet(player => player.Cards).Returns(0b010000_0_100100__001000_0_100010__000100_0_100001__000010_0_000000UL);
             player.SetupGet(player => player.NumPasses).Returns(3);
             var random = new Mock<IRandom>();
-            random.Setup(random => random.Next(It.IsAny<int>())).Returns(0);
+            random.Setup(random => random.Next(It.IsAny<uint>())).Returns(0);
             var engine = new EngineStandardA(Rule.Standard, random.Object);
 
             int actual = engine.Next(game.Object, player.Object);
@@ -89,7 +90,7 @@ namespace Seven.Core.Test.Engines
             player.SetupGet(player => player.Cards).Returns(0b100000_0_100100__001000_0_100010__000100_0_100001__000010_0_101000UL);
             player.SetupGet(player => player.NumPasses).Returns(2);
             var random = new Mock<IRandom>();
-            random.Setup(random => random.Next(It.IsAny<int>())).Returns(0);
+            random.Setup(random => random.Next(It.IsAny<uint>())).Returns(0);
             var engine = new EngineStandardA(Rule.Standard, random.Object);
 
             int actual = engine.Next(game.Object, player.Object);
@@ -109,7 +110,7 @@ namespace Seven.Core.Test.Engines
             player.SetupGet(player => player.Cards).Returns(0b100011_0_111000__001100_0_001111__000000_0_001010__000000_0_000000UL);
             player.SetupGet(player => player.NumPasses).Returns(2);
             var random = new Mock<IRandom>();
-            random.SetupSequence(random => random.Next(It.IsAny<int>()))
+            random.SetupSequence(random => random.Next(It.IsAny<uint>()))
                 .Returns(0)
                 .Returns(1)
                 .Returns(2)

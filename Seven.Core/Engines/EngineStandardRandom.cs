@@ -1,4 +1,5 @@
-﻿using Seven.Core.Rules;
+﻿using Seven.Core.Random;
+using Seven.Core.Rules;
 using System.Collections.ObjectModel;
 
 namespace Seven.Core.Engines

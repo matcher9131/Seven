@@ -1,4 +1,4 @@
-﻿using Seven.Core;
+﻿using Seven.Core.Random;
 
 namespace Seven.GA
 {
@@ -8,14 +8,14 @@ namespace Seven.GA
 
         public int[] Mutate(int[] genes)
         {
-            int l = random.Next(genes.Length);
-            int r = random.Next(genes.Length);
+            int l = (int)random.Next((uint)genes.Length);
+            int r = (int)random.Next((uint)genes.Length);
             if (l > r)
             {
                 (l, r) = (r, l);
             }
             ++r;
-            int i = random.Next(genes.Length - (r - l));
+            int i = (int)random.Next((uint)(genes.Length - (r - l)));
             return Helper.CutAndInsert(genes, l, r, i);
         }
     }

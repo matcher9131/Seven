@@ -1,5 +1,6 @@
 ﻿using Moq;
 using Seven.Core.Models;
+using Seven.Core.Random;
 using System.Numerics;
 
 namespace Seven.Core.Test.Models
@@ -11,7 +12,7 @@ namespace Seven.Core.Test.Models
         {
             int numPlayers = 5;
             var randomMock = new Mock<IRandom>();
-            randomMock.Setup(random => random.Next(It.IsAny<int>())).Returns(3);
+            randomMock.Setup(random => random.Next(It.IsAny<uint>())).Returns(3);
             var dealer = new Dealer(randomMock.Object);
             ulong[] dealtCards = dealer.Deal(numPlayers, true);
             Assert.Equal(11, BitOperations.PopCount(dealtCards[0]));
@@ -26,7 +27,7 @@ namespace Seven.Core.Test.Models
         {
             int numPlayers = 5;
             var randomMock = new Mock<IRandom>();
-            randomMock.Setup(random => random.Next(It.IsAny<int>())).Returns(0);
+            randomMock.Setup(random => random.Next(It.IsAny<uint>())).Returns(0);
             var dealer = new Dealer(randomMock.Object);
             ulong[] dealtCards = dealer.Deal(numPlayers, false);
             Assert.Equal(0b0000000000000_0000000000000_0000000000000_0111111111110UL, dealtCards[0]);

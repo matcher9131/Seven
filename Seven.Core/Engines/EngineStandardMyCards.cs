@@ -1,4 +1,5 @@
 ﻿using Seven.Core.Models;
+using Seven.Core.Random;
 using Seven.Core.Rules;
 using System.Collections.ObjectModel;
 
@@ -80,7 +81,7 @@ namespace Seven.Core.Engines
                 }
             }
 
-            return playCardOptions[this.random.Next(playCardOptions.Count)];
+            return playCardOptions[(int)this.random.Next((uint)playCardOptions.Count)];
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Seven.Core;
+﻿using Seven.Core.Random;
 
 namespace Seven.GA
 {
@@ -15,7 +15,7 @@ namespace Seven.GA
             while (inDegree.Count > 0)
             {
                 List<int> nextSource = [];
-                this.random.Shuffle(source);
+                this.random.ShuffleList(source);
                 result.AddRange(source);
                 foreach (int from in source)
                 {

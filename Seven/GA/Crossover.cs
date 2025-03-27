@@ -1,4 +1,4 @@
-﻿using Seven.Core;
+﻿using Seven.Core.Random;
 using System.Collections.Immutable;
 
 namespace Seven.GA
@@ -15,7 +15,7 @@ namespace Seven.GA
             List<int> result = new(K);
             for (int i = 0; i < Indices.Length; ++i)
             {
-                if (this.random.Next(Indices.Length - i) < K - result.Count)
+                if (this.random.Next((uint)(Indices.Length - i)) < K - result.Count)
                 {
                     result.Add(Indices[i]);
                 }

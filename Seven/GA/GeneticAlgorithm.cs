@@ -1,6 +1,6 @@
-﻿using Seven.Core;
-using Seven.Core.Engines;
+﻿using Seven.Core.Engines;
 using Seven.Core.Models;
+using Seven.Core.Random;
 using Seven.Core.Rules;
 using System.Collections.Frozen;
 
@@ -19,6 +19,8 @@ namespace Seven.GA
         private static readonly FrozenDictionary<int, int> basePriorityMap = Enumerable.Range(0, 64).Where(i => !Graph.GetVertexes().Contains(i)).ToFrozenDictionary(x => x, _ => -1);
 
         private static readonly Comparison<(double value, int[] gene)> populationComparison = (a, b) => a.value.CompareTo(b.value);
+
+        // TODO: Resultファイルを読み込んでRunContinueができるようにする
 
         public void Run(Func<IEngine> oppositeEngineFactory)
         {
@@ -61,10 +63,6 @@ namespace Seven.GA
             {
                 currentPopulation.Add((0, gene));
             }
-
-            //
-            Console.WriteLine("foo");
-            //
 
             for (int iGen = 0; iGen < NumGeneration; ++iGen)
             {
@@ -116,20 +114,7 @@ namespace Seven.GA
                 currentPopulation = nextPopulation;
             }
 
-            DateTime endTime = DateTime.Now;
-            TimeSpan span = endTime - startTime;
-
-            string logContent = $"NumGeneration = {NumGeneration}\nNumPopulation = {NumPopulation}\nNumElite = {NumElite}\nMutationPercent = {MutationPercent}\nOppositeEngine: {oppositeEngineFactory().GetType().Name}\n";
-            for (int i = 0; i < 5; ++i)
-            {
-                var (value, gene) = currentPopulation[^(i + 1)];
-                logContent += $"Population 0:\n  gene: [{string.Join(", ", gene)}]\n  value: {value:0.000000}\n";
-            }
-            logContent += $"Elapsed: {span:hh\\:mm\\:ss}\n";
-            Logger logger = new();
-            logger.Log(logContent);
-
-            Console.WriteLine(logContent);
+            
         }
     }
 }

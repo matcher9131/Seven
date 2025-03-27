@@ -1,4 +1,6 @@
-﻿namespace Seven.Core.Models
+﻿using Seven.Core.Random;
+
+namespace Seven.Core.Models
 {
     public class Dealer(IRandom random)
     {
@@ -7,21 +9,16 @@
         public ulong[] Deal(int numPlayers, bool containsJoker)
         {
             int numCards = containsJoker ? 53 : 52;
-            int[] playerNumCards = Enumerable.Repeat(numCards / numPlayers, numPlayers).ToArray();
+            int[] playerNumCards = [.. Enumerable.Repeat(numCards / numPlayers, numPlayers)];
             int r = numCards % numPlayers;
-            int offset = random.Next(numPlayers);
+            int offset = (int)this.random.Next((uint)numPlayers);
             for (int i = 0; i < r; ++i)
             {
                 ++playerNumCards[(i + offset) % numPlayers];
             }
 
-            int[] cards = Enumerable.Range(0, numCards).ToArray();
-            // Fisher–Yates shuffle
-            for (int i = cards.Length - 1; i > 0; --i)
-            {
-                int j = random.Next(i + 1);
-                (cards[i], cards[j]) = (cards[j], cards[i]);
-            }
+            int[] cards = [.. Enumerable.Range(0, numCards)];
+            this.random.ShuffleList(cards);
 
             ulong[] dealtCards = new ulong[numPlayers];
             int startIndex = 0;
