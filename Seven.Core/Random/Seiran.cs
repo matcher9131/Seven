@@ -9,11 +9,11 @@ namespace Seven.Core.Random
     /// <seealso cref="https://github.com/andanteyk/prng-seiran"/>
     public sealed class Seiran : IRandom
     {
-        private ulong State0;
-        private ulong State1;
+        private ulong state0;
+        private ulong state1;
 
         [ThreadStatic]
-        private static Seiran? StaticInstance;
+        private static Seiran? staticInstance;
 
         /// <summary>
         /// Gets a static instance of <see cref="Seiran"/>.
@@ -22,8 +22,7 @@ namespace Seven.Core.Random
         /// If you don't need reproducibility, we recommend using this.
         /// This instance is thread static.
         /// </remarks>
-        public static Seiran I => StaticInstance ??= new Seiran();
-
+        public static Seiran Instance => staticInstance ??= new Seiran();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Seiran"/> class using a cryptographically secure pseudo-random number generator.
@@ -43,37 +42,10 @@ namespace Seven.Core.Random
             }
             while (state[0] == 0 && state[1] == 0);
 
-            State0 = state[0];
-            State1 = state[1];
+            state0 = state[0];
+            state1 = state[1];
         }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Seiran"/> class using the specified <paramref name="seed"/> value.
-        /// </summary>
-        /// <param name="seed">
-        /// The seed value used to initialize the <see cref="Seiran"/> class.
-        /// If the same value is specified, the same sequence of random numbers will be generated.
-        /// </param>
-        /// <remarks>
-        /// This constructor is provided for compatibility with <see cref="System.Random"/>.
-        /// You should use <see cref="Seiran()"/> if you want a completely random instance,
-        /// and <see cref="Seiran(ReadOnlySpan{ulong})"/> if you need to reproduce a sequence of random numbers.
-        /// </remarks>
-        public Seiran(long seed)
-        {
-            ulong x = (ulong)seed;
-
-            static (ulong value, ulong state) splitMix(ulong state)
-            {
-                ulong z = state += 0x9e3779b97f4a7c15;
-                z = (z ^ z >> 30) * 0xbf58476d1ce4e5b9;
-                z = (z ^ z >> 27) * 0x94d049bb133111eb;
-                return (z ^ z >> 31, state);
-            }
-
-            (State0, x) = splitMix(x);
-            (State1, _) = splitMix(x);
-        }
+        
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Seiran"/> class using the specified <paramref name="state"/>.
@@ -89,8 +61,8 @@ namespace Seven.Core.Random
             if (state.Length < 2) throw new ArgumentOutOfRangeException(nameof(state));
             if (state[0] == 0 && state[1] == 0) throw new ArgumentOutOfRangeException(nameof(state));
 
-            State0 = state[0];
-            State1 = state[1];
+            state0 = state[0];
+            state1 = state[1];
         }
 
         /// <summary>
@@ -102,8 +74,8 @@ namespace Seven.Core.Random
         {
             ArgumentNullException.ThrowIfNull(original);
 
-            State0 = original.State0;
-            State1 = original.State1;
+            state0 = original.state0;
+            state1 = original.state1;
         }
 
         /// <summary>
@@ -113,7 +85,7 @@ namespace Seven.Core.Random
         /// <remarks>
         /// You can use <see cref="Seiran(ReadOnlySpan{ulong})"/> to restore the current state of this instance.
         /// </remarks>
-        public ulong[] GetState() => [State0, State1];
+        public ulong[] GetState() => [state0, state1];
 
 
 
@@ -125,11 +97,11 @@ namespace Seven.Core.Random
         {
             static ulong rotl(ulong x, int k) => x << k | x >> -k;
 
-            ulong s0 = State0, s1 = State1;
+            ulong s0 = state0, s1 = state1;
             ulong result = rotl((s0 + s1) * 9, 29) + s0;
 
-            State0 = s0 ^ rotl(s1, 29);
-            State1 = s0 ^ s1 << 9;
+            state0 = s0 ^ rotl(s1, 29);
+            state1 = s0 ^ s1 << 9;
 
             return result;
         }
@@ -251,15 +223,15 @@ namespace Seven.Core.Random
                 {
                     if (((jumpPolynomial[i] >> b) & 1) != 0)
                     {
-                        t0 ^= State0;
-                        t1 ^= State1;
+                        t0 ^= state0;
+                        t1 ^= state1;
                     }
                     NextULong();
                 }
             }
 
-            State0 = t0;
-            State1 = t1;
+            state0 = t0;
+            state1 = t1;
         }
 
         /// <summary>
@@ -297,7 +269,7 @@ namespace Seven.Core.Random
         {
             static ulong rotl(ulong x, int k) => x << k | x >> -k;
 
-            ulong t1 = rotl(State0 ^ State1, 64 - 29);
+            ulong t1 = rotl(state0 ^ state1, 64 - 29);
             t1 ^= t1 << 44 ^ (t1 & ~0xffffful) << 24;
             t1 ^= (t1 & (0x7ffful << 40)) << 4;
             t1 ^= (t1 & (0x7fful << 40)) << 8;
@@ -305,8 +277,8 @@ namespace Seven.Core.Random
             t1 ^= (t1 & (0xffffful << 35)) >> 20;
             t1 ^= (t1 & (0x7ffful << 20)) >> 20;
 
-            State0 ^= rotl(t1, 29);
-            State1 = t1;
+            state0 ^= rotl(t1, 29);
+            state1 = t1;
         }
     }
 }
