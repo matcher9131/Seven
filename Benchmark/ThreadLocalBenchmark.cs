@@ -28,9 +28,16 @@ namespace Benchmark
         [Benchmark]
         public long Evaluate()
         {
+            Random seedRandom = new();
+            object lockObj = new();
             return Enumerable.Range(0, N).AsParallel().Sum(_ =>
             {
-                Engine engine = new(new Random(Random.Shared.Next()));
+                int seed;
+                lock(lockObj)
+                {
+                    seed = seedRandom.Next();
+                }
+                Engine engine = new(new Random(seed));
                 return (long)engine.Next();
             });
         }
@@ -38,10 +45,17 @@ namespace Benchmark
         [Benchmark]
         public long EvaluateThreadLocal()
         {
+            Random seedRandom = new();
+            object lockObj = new();
             EngineThreadLocal engine = new();
             return Enumerable.Range(0, N).AsParallel().Sum(_ =>
             {
-                engine.SetRandom(new Random(Random.Shared.Next()));
+                int seed;
+                lock (lockObj)
+                {
+                    seed = seedRandom.Next();
+                }
+                engine.SetRandom(new Random(seed));
                 return (long)engine.Next();
             });
         }
