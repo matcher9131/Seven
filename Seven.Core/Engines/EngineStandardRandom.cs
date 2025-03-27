@@ -8,7 +8,7 @@ namespace Seven.Core.Engines
     {
         private static ReadOnlyDictionary<int, int> PriorityMap => Enumerable.Range(-1, 65).ToDictionary(x => x, x => 0).AsReadOnly();
 
-        public EngineStandardRandom(Rule rule, IRandom random) : base(rule, random, PriorityMap)
+        public EngineStandardRandom(Rule rule) : base(rule, PriorityMap)
         {
             if (rule != Rule.Standard) throw new NotSupportedException("This engine does not support the given rule.");
         }

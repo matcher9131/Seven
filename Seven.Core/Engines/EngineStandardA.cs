@@ -1,5 +1,4 @@
-﻿using Seven.Core.Models;
-using Seven.Core.Random;
+﻿using Seven.Core.Random;
 using Seven.Core.Rules;
 using System.Collections.ObjectModel;
 using System.Numerics;
@@ -44,7 +43,7 @@ namespace Seven.Core.Engines
             }
         }).AsReadOnly();
 
-        public EngineStandardA(Rule rule, IRandom random) : base(rule, random, PriorityMap)
+        public EngineStandardA(Rule rule, IRandom random) : base(rule, PriorityMap)
         {
             if (rule != Rule.Standard) throw new NotSupportedException("This engine does not support the given rule.");
         }

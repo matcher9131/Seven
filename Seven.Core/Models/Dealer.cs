@@ -2,12 +2,19 @@
 
 namespace Seven.Core.Models
 {
-    public class Dealer(IRandom random)
+    public class Dealer
     {
-        private readonly IRandom random = random;
+        private IRandom? random;
+
+        public void SetRandom(IRandom random)
+        {
+            this.random = random;
+        }
 
         public ulong[] Deal(int numPlayers, bool containsJoker)
         {
+            if (this.random is null) throw new InvalidOperationException("'random' is null.");
+
             int numCards = containsJoker ? 53 : 52;
             int[] playerNumCards = [.. Enumerable.Repeat(numCards / numPlayers, numPlayers)];
             int r = numCards % numPlayers;

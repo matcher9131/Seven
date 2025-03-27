@@ -6,15 +6,14 @@ using System.Collections.ObjectModel;
 namespace Seven.Core.Engines
 {
     // 自分のカードとパス回数のみを見て判断する
-    public class EngineStandardMyCards : EngineBase
+    public class EngineStandardMyCards : IEngine
     {
-        private readonly IRandom random;
         private readonly ReadOnlyDictionary<int, int> priorityMap;
+        private IRandom? random;
 
-        public EngineStandardMyCards(Rule rule, IRandom random, ReadOnlyDictionary<int, int> priorityMap)
+        public EngineStandardMyCards(Rule rule, ReadOnlyDictionary<int, int> priorityMap)
         {
             if (rule != Rule.Standard) throw new NotSupportedException("This engine does not support the given rule.");
-            this.random = random;
             this.priorityMap = priorityMap;
         }
 
@@ -55,8 +54,15 @@ namespace Seven.Core.Engines
             return (pattern, playCard);
         }
 
-        public override int Next(IReadonlyGame game, IReadonlyPlayer player)
+        public void SetRandom(IRandom random)
         {
+            this.random = random;
+        }
+
+        public int Next(IReadonlyGame game, IReadonlyPlayer player)
+        {
+            if (this.random is null) throw new InvalidOperationException("'random' is null.");
+
             List<int> playCardOptions = [-1];
             int currentPriority = player.NumPasses == game.Rule.NumPasses ? int.MaxValue : this.priorityMap[-1];
 
