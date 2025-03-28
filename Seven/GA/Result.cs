@@ -3,6 +3,6 @@
     public record Result(
         Settings Settings,
         int Generation,
-        (double value, int[] gene)[] Population
+        List<Individual> Population
     );
 }
