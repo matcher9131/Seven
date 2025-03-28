@@ -5,22 +5,20 @@ using Seven.Core.Rules;
 
 namespace Seven.GA
 {
-    public class Evaluation(Rule rule, Func<IRandom> randomFactory)
+    public class Evaluation(Rule rule, int numGames, Func<IRandom> randomFactory)
     {
         private readonly Rule rule = rule;
         private readonly Func<IRandom> randomFactory = randomFactory;
 
         public double Evaluate(IEngine engine, IEngine[] oppositeEngines)
         {
-            const int NumGames = 100000;
-
             IEngine[] engines = [engine, .. oppositeEngines];
             Dealer dealer = new();
 
             int numInvalidGames = 0;
             object numInvalidGamesLockObject = new();
 
-            int sumPoint = Enumerable.Range(0, NumGames).AsParallel().Sum(_ =>
+            int sumPoint = Enumerable.Range(0, numGames).AsParallel().Sum(_ =>
             {
                 IRandom gameRandom = this.randomFactory();
                 dealer.SetRandom(gameRandom);
@@ -57,7 +55,7 @@ namespace Seven.GA
                 };
             });
 
-            return sumPoint / (7.0 * (NumGames - numInvalidGames));
+            return sumPoint / (7.0 * (numGames - numInvalidGames));
         }
     }
 }

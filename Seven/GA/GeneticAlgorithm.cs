@@ -1,29 +1,34 @@
 ﻿using Seven.Core.Engines;
-using Seven.Core.Models;
 using Seven.Core.Random;
 using Seven.Core.Rules;
 using System.Collections.Frozen;
+using System.Linq.Expressions;
 
 namespace Seven.GA
 {
     public class GeneticAlgorithm(Rule rule, IRandom random)
     {
-        private const int NumGeneration = 2;
-        private const int NumPopulation = 100;
-        private const int NumElite = 2;
-        private const int MutationPercent = 10;
+        private const int DefaultNumPopulation = 100;
+        private const int DefaultNumEvaluationGames = 100000;
+        private const int DefaultNumElites = 2;
+        private const int DefaultMutationPercent = 10;
 
         private readonly Rule rule = rule;
         private readonly IRandom random = random;
 
         private static readonly FrozenDictionary<int, int> basePriorityMap = Enumerable.Range(0, 64).Where(i => !Graph.GetVertexes().Contains(i)).ToFrozenDictionary(x => x, _ => -1);
 
-        private static readonly Comparison<(double value, int[] gene)> populationComparison = (a, b) => a.value.CompareTo(b.value);
-
-        // TODO: Resultファイルを読み込んでRunContinueができるようにする
-
-        public void Run(Func<IEngine> oppositeEngineFactory)
+        private static readonly Comparison<Individual> populationComparison = (a, b) => a.Value.CompareTo(b.Value);
+        
+        private List<Individual> CreateInitialPopulation()
         {
+            InitialPopulation initialPopulation = new(this.random);
+            return [.. initialPopulation.Generate(DefaultNumPopulation).Select(gene => new Individual(0.0, gene))];
+        }
+
+        public Result Run(Result? prevResult, CancellationToken token)
+        {
+            #region Local functions
             IEngine createEngine(int[] gene)
             {
                 Dictionary<int, int> priorityMap = new(basePriorityMap);
@@ -31,10 +36,10 @@ namespace Seven.GA
                 {
                     priorityMap[gene[i]] = i;
                 }
-                return new EngineStandardMyCards(this.rule, this.random, priorityMap.AsReadOnly());
+                return new EngineStandardMyCards(this.rule, priorityMap.AsReadOnly());
             }
 
-            int[] rouletteSelect(List<(double value, int[] gene)> population, double sumValues)
+            int[] rouletteSelect(List<Individual> population, double sumValues)
             {
                 double rand = this.random.NextDouble();
                 double current = 0;
@@ -46,75 +51,94 @@ namespace Seven.GA
                         return gene;
                     }
                 }
-                return population[^1].gene;
+                return population[^1].Gene;
             }
 
-            DateTime startTime = DateTime.Now;
+            Func<IEngine> createOppositeEngineFactory(Type engineType)
+            {
+                Type[] paramTypes = [typeof(Rule)];
+                var ctorInfo = engineType.GetConstructor(paramTypes) ?? throw new InvalidOperationException("Constructor is not found.");
+                var paramExpression = Expression.Constant(Rule.Standard);
+                var body = Expression.New(ctorInfo, [paramExpression]);
+                var lambda = Expression.Lambda<Func<IEngine>>(body);
+                var func = lambda.Compile();
+                return func;
+            }
+            #endregion
 
-            InitialPopulation initialPopulation = new(this.random);
-            Evaluation evaluation = new(this.rule, new Dealer(this.random));
+            if (prevResult == null)
+            {
+                prevResult = new Result(
+                    new Settings(DefaultNumPopulation, DefaultNumEvaluationGames, DefaultNumElites, DefaultMutationPercent, "Seven.Core.Engines.EngineStandardA, Seven.Core"),
+                    0,
+                    this.CreateInitialPopulation()
+                );
+            }
+            Settings settings = prevResult.Settings;
+
+            Type oppositeEngineType = Type.GetType(settings.OppositeEngineName) ?? throw new InvalidOperationException("Invalid opposite engine name");
+            var oppositeEngineFactory = createOppositeEngineFactory(oppositeEngineType);
+
+            Evaluation evaluation = new(this.rule, settings.NumEvaluationGames, () => Seiran.Instance);
             Crossover crossover = new(this.random);
             Mutation mutation = new(this.random);
 
-            List<(double value, int[] gene)> currentPopulation = new(NumPopulation);
-            List<(double value, int[] gene)> nextPopulation = new(NumPopulation);
+            List<Individual> currentPopulation = prevResult.Population;
+            List<Individual> nextPopulation = new(settings.NumPopulation);
 
-            foreach (var gene in initialPopulation.Generate(NumPopulation))
+            int iGen = prevResult.Generation;
+            for (; ; ++iGen)
             {
-                currentPopulation.Add((0, gene));
-            }
-
-            for (int iGen = 0; iGen < NumGeneration; ++iGen)
-            {
-                Console.WriteLine($"Generation: {iGen}");
+                Console.WriteLine($"Generation {iGen}");
 
                 // 評価
-                for (int i = 0; i < NumPopulation; ++i)
+                for (int i = 0; i < settings.NumPopulation; ++i)
                 {
                     double newValue = evaluation.Evaluate(
-                        createEngine(currentPopulation[i].gene),
+                        createEngine(currentPopulation[i].Gene),
                         [oppositeEngineFactory(), oppositeEngineFactory(), oppositeEngineFactory(), oppositeEngineFactory()]
                     );
-                    currentPopulation[i] = (newValue, currentPopulation[i].gene);
+                    currentPopulation[i] = new Individual(newValue, currentPopulation[i].Gene);
                 }
                 currentPopulation.Sort(populationComparison);
 
-                // 終了判定
-                if (iGen == NumGeneration - 1)
+                // ユーザーによる中断
+                if (token.IsCancellationRequested)
                 {
                     break;
                 }
 
-                double sumEvaluation = currentPopulation.Sum(x => x.value);
-                nextPopulation = new(NumPopulation);
+                double sumEvaluation = currentPopulation.Sum(x => x.Value);
+                nextPopulation = new(settings.NumPopulation);
+
                 // エリート選択
-                for (int i = 0; i < NumElite; ++i)
+                for (int i = 0; i < settings.NumElites; ++i)
                 {
                     nextPopulation.Add(currentPopulation[^(i + 1)]);
                 }
-                
+
                 // 交叉および突然変異
-                while (nextPopulation.Count < NumPopulation)
+                while (nextPopulation.Count < settings.NumPopulation)
                 {
                     int[] p1 = rouletteSelect(currentPopulation, sumEvaluation);
                     int[] p2 = rouletteSelect(currentPopulation, sumEvaluation);
                     var (c1, c2) = crossover.Cross(p1, p2);
-                    if (this.random.Next(100) < MutationPercent)
+                    if (this.random.Next(100) < settings.MutationPercent)
                     {
                         c1 = mutation.Mutate(c1);
                     }
-                    if (this.random.Next(100) < MutationPercent)
+                    if (this.random.Next(100) < settings.MutationPercent)
                     {
                         c2 = mutation.Mutate(c2);
                     }
-                    nextPopulation.Add((0, c1));
-                    nextPopulation.Add((0, c2));
+                    nextPopulation.Add(new Individual(0, c1));
+                    nextPopulation.Add(new Individual(0, c2));
                 }
 
                 currentPopulation = nextPopulation;
             }
 
-            
+            return new Result(settings, iGen, currentPopulation);
         }
     }
 }
