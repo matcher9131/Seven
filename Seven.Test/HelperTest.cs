@@ -1,4 +1,6 @@
-﻿namespace Seven.Test
+﻿using Seven.GA;
+
+namespace Seven.Test
 {
     public class HelperTest
     {

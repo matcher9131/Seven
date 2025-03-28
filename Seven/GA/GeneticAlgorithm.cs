@@ -10,7 +10,7 @@ namespace Seven.GA
     {
         private const int DefaultNumPopulation = 100;
         private const int DefaultNumEvaluationGames = 100000;
-        private const int DefaultNumElites = 2;
+        private const int DefaultNumElites = 4;
         private const int DefaultMutationPercent = 10;
 
         private readonly Rule rule = rule;
@@ -39,16 +39,17 @@ namespace Seven.GA
                 return new EngineStandardMyCards(this.rule, priorityMap.AsReadOnly());
             }
 
-            int[] rouletteSelect(List<Individual> population, double sumValues)
+            int[] rankSelect(List<Individual> population)
             {
-                double rand = this.random.NextDouble();
-                double current = 0;
-                foreach (var (value, gene) in population)
+                int max = population.Count * (population.Count + 1) / 2;
+                int rand = (int)this.random.Next((uint)max);
+                int current = 0;
+                for (int i = 0; i < population.Count; ++i)
                 {
-                    current += value;
+                    current += i + 1;
                     if (rand < current)
                     {
-                        return gene;
+                        return population[i].Gene;
                     }
                 }
                 return population[^1].Gene;
@@ -108,7 +109,7 @@ namespace Seven.GA
                     break;
                 }
 
-                double sumEvaluation = currentPopulation.Sum(x => x.Value);
+                // double sumEvaluation = currentPopulation.Sum(x => x.Value);
                 nextPopulation = new(settings.NumPopulation);
 
                 // エリート選択
@@ -120,8 +121,8 @@ namespace Seven.GA
                 // 交叉および突然変異
                 while (nextPopulation.Count < settings.NumPopulation)
                 {
-                    int[] p1 = rouletteSelect(currentPopulation, sumEvaluation);
-                    int[] p2 = rouletteSelect(currentPopulation, sumEvaluation);
+                    int[] p1 = rankSelect(currentPopulation);
+                    int[] p2 = rankSelect(currentPopulation);
                     var (c1, c2) = crossover.Cross(p1, p2);
                     if (this.random.Next(100) < settings.MutationPercent)
                     {
